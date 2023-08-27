@@ -9,7 +9,7 @@ using MongoDB.Bson;
 
 namespace RESTFUL.Repositories
 {
-    public class MongoDBItemsRepository : IInMemoryItemsRepository
+    public class MongoDBItemsRepository : IItemsRepository
     {
         private const string dbName = "RESTFUL";
         private const string dbCollection = "items";
@@ -23,32 +23,32 @@ namespace RESTFUL.Repositories
             _collection = db.GetCollection<Item>(dbCollection);
         }
 
-        public IEnumerable<Item> GetItems()
+        public async Task<IEnumerable<Item>> GetItemsAsync()
         {
-            return _collection.Find(new BsonDocument()).ToList();
+            return await _collection.Find(new BsonDocument()).ToListAsync();
         }
 
-        public Item GetItem(Guid id)
+        public async Task<Item> GetItemAsync(Guid id)
         {
             var filter = filterBuilder.Eq(x => x.Id, id);
-            return _collection.Find(filter).SingleOrDefault();
+            return await _collection.Find(filter).SingleOrDefaultAsync();
         }
 
-        public void CreateItem(Item item)
+        public async Task CreateItemAsync(Item item)
         {
-            _collection.InsertOne(item);
+            await _collection.InsertOneAsync(item);
         }
 
-        public void UpdateItem(Item item)
+        public async Task UpdateItemAsync(Item item)
         {
             var filter = filterBuilder.Eq(x => x.Id, item.Id);
-            _collection.ReplaceOne(filter, item);
+            await _collection.ReplaceOneAsync(filter, item);
         }
 
-        public void DeleteItem(Guid id)
+        public async Task DeleteItemAsync(Guid id)
         {
             var filter = filterBuilder.Eq(x => x.Id, id);
-            _collection.DeleteOne(filter);
+            await _collection.DeleteOneAsync(filter);
         }
     }
 }

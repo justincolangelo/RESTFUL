@@ -44,9 +44,11 @@ namespace RESTFUL
 
             // we should only need one instance throughout the app lifetime
             // choose which repo to use (mongo, postgres, in memory, ...)
-            services.AddSingleton<IInMemoryItemsRepository, MongoDBItemsRepository>();
+            services.AddSingleton<IItemsRepository, MongoDBItemsRepository>();
 
-            services.AddControllers();
+            services.AddControllers(options => {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RESTFUL", Version = "v1" });

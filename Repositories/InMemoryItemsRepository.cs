@@ -7,7 +7,7 @@ using RESTFUL.Interfaces;
 
 namespace RESTFUL.Repositories
 {
-    public class InMemoryItemsRepository : IInMemoryItemsRepository
+    public class InMemoryItemsRepository : IItemsRepository
     {
         // instance of the list should not change after construction
         private readonly List<Item> items = new()
@@ -17,31 +17,34 @@ namespace RESTFUL.Repositories
             new Item { Id = Guid.NewGuid(), Name = "Bass Electric Guitar", Price = 80, CreatedDate = DateTimeOffset.UtcNow }
         }; 
 
-        public IEnumerable<Item> GetItems()
+        public async Task<IEnumerable<Item>> GetItemsAsync()
         {
-            return items;
+            return await Task.FromResult(items);
         }
 
-        public Item GetItem(Guid id)
+        public async Task<Item> GetItemAsync(Guid id)
         {
-            return items.SingleOrDefault(x => x.Id == id);
+            return await Task.FromResult(items.SingleOrDefault(x => x.Id == id));
         }
 
-        public void CreateItem(Item item)
+        public async Task CreateItemAsync(Item item)
         {
             items.Add(item);
+            await Task.CompletedTask;
         }
 
-        public void UpdateItem(Item item)
+        public async Task UpdateItemAsync(Item item)
         {
             var itemIndex = items.FindIndex(x => x.Id == item.Id);
             items[itemIndex] = item;
+            await Task.CompletedTask;
         }
 
-        public void DeleteItem(Guid id)
+        public async Task DeleteItemAsync(Guid id)
         {
             var itemIndex = items.FindIndex(x => x.Id == id);
             items.RemoveAt(itemIndex);
+            await Task.CompletedTask;
         }
     }
 }

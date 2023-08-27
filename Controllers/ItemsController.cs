@@ -16,25 +16,26 @@ namespace RESTFUL.Controllers
     public class ItemsController : ControllerBase
     {
         // use dependency injection instead of creating new instances each time the endpoints are hit
-        private readonly IInMemoryItemsRepository _repository;
-        public ItemsController(IInMemoryItemsRepository repository)
+        private readonly IItemsRepository _repository;
+        public ItemsController(IItemsRepository repository)
         {
             _repository = repository;
         }
 
         // GET /items
         [HttpGet]
-        public IEnumerable<ItemDTO> GetItems()
+        public async Task<IEnumerable<ItemDTO>> GetItems()
         {
-            return _repository.GetItems().Select(item => item.AsDTO());
+            return (await _repository.GetItemsAsync())
+                .Select(item => item.AsDTO());
         }
 
         // GET /items/{id}
         [HttpGet("{id}")]
         // return http response or the Item type
-        public ActionResult<ItemDTO> GetItem(Guid id)
+        public async Task<ActionResult<ItemDTO>> GetItem(Guid id)
         {
-            var item = _repository.GetItem(id);
+            var item = await _repository.GetItemAsync(id);
 
             if (item == null)
             {
@@ -46,7 +47,7 @@ namespace RESTFUL.Controllers
 
         // POST /items
         [HttpPost]
-        public ActionResult<ItemDTO> CreateItem(CreateItemDTO item)
+        public async Task<ActionResult<ItemDTO>> CreateItem(CreateItemDTO item)
         {
             Item newItem = new()
             {
@@ -56,16 +57,16 @@ namespace RESTFUL.Controllers
                 CreatedDate = DateTimeOffset.UtcNow
             };
 
-            _repository.CreateItem(newItem);
+            await _repository.CreateItemAsync(newItem);
 
             return CreatedAtAction(nameof(GetItem), new { id = newItem.Id }, newItem.AsDTO());
         }
 
         // PUT /items/{id}
         [HttpPut("{id}")]
-        public ActionResult UpdateItem(Guid id, UpdateItemDTO item)
+        public async Task<ActionResult> UpdateItem(Guid id, UpdateItemDTO item)
         {
-            var toUpdate = _repository.GetItem(id);
+            var toUpdate = await _repository.GetItemAsync(id);
 
             if (toUpdate == null)
             {
@@ -79,23 +80,23 @@ namespace RESTFUL.Controllers
                 Price = item.Price
             };
 
-            _repository.UpdateItem(updatedItem);
+            await _repository.UpdateItemAsync(updatedItem);
 
             return NoContent();
         }
 
         // DELETE /items/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteItem(Guid id)
+        public async Task<ActionResult> DeleteItem(Guid id)
         {
-            var item = _repository.GetItem(id);
+            var item = await _repository.GetItemAsync(id);
 
             if (item == null)
             {
                 return NotFound();
             }
 
-            _repository.DeleteItem(id);
+            await _repository.DeleteItemAsync(id);
 
             return NoContent();
         }
