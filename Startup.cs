@@ -13,6 +13,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using RESTFUL.Interfaces;
 using RESTFUL.Repositories;
+using RESTFUL.Settings;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace RESTFUL
 {
@@ -28,8 +33,18 @@ namespace RESTFUL
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+            BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
+
+            services.AddSingleton<IMongoClient>(serviceProvider =>
+            {
+                var settings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+                return new MongoClient(settings.ConnectionString);
+            });
+
             // we should only need one instance throughout the app lifetime
-            services.AddSingleton<IInMemoryItemsRepository, InMemoryItemsRepository>();
+            // choose which repo to use (mongo, postgres, in memory, ...)
+            services.AddSingleton<IInMemoryItemsRepository, MongoDBItemsRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
