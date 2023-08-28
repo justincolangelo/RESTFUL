@@ -1,0 +1,52 @@
+﻿---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: restfulapp
+  name: restful-deployment
+spec:
+  selector:
+    matchLabels:
+      app: restfulapp
+  template:
+    metadata:
+      labels:
+        app: restfulapp
+    spec:
+      containers:
+      - env:
+        - name: MongoDBSettings__Host
+          value: mongodb-service
+        - name: MongoDBSettings__Password
+          valueFrom:
+            secretKeyRef:
+              key: mongodb-password
+              name: restful-secrets
+        image: justincolangelo/restful:v1.0.2
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 80
+        name: restfulapp
+        ports:
+          - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 80
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: restful-service
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: restfulapp
+  type: LoadBalancer
