@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RESTFUL.Entities
 {
-    // immutable record type
+    // Schema was needed with Postgres otherwise "relation not found" errors thrown
+    [Table("items", Schema = "RESTFUL")]
     public record Item
     {
         // init is used when a value is only allowed to be set during initialization
@@ -13,6 +12,6 @@ namespace RESTFUL.Entities
         public Guid Id { get; init; }
         public string Name { get; init; }
         public decimal Price { get; init; }
-        public DateTimeOffset CreatedDate { get; init; }
+        public DateTime CreatedDate { get; init; }
     }
 }

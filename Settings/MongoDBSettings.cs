@@ -16,11 +16,11 @@ namespace RESTFUL.Settings
         {
             get
             {
-                //return $"mongodb://{Host}:{Port}";
+                return $"mongodb://{Host}:{Port}";
                 // if you've created a secret for password you can use this connection string
                 // dotnet user-secrets init
                 // dotnet user-secrets set MongoDBSettings:Password somepassword
-                return $"mongodb://{User}:{Password}@{Host}:{Port}";
+                //return $"mongodb://{User}:{Password}@{Host}:{Port}";
             }
         }
     }

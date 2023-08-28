@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RESTFUL.Entities;
-using RESTFUL.Repositories;
 using RESTFUL.Interfaces;
 using RESTFUL.DTOs;
-using RESTFUL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -63,7 +61,7 @@ namespace RESTFUL.Controllers
                 Id = Guid.NewGuid(),
                 Name = item.Name,
                 Price = item.Price,
-                CreatedDate = DateTimeOffset.UtcNow
+                CreatedDate = DateTime.UtcNow
             };
 
             await _repository.CreateItemAsync(newItem);

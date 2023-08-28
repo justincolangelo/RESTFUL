@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,6 +20,8 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Text.Json;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using RESTFUL.Context;
 
 namespace RESTFUL
 {
@@ -47,9 +47,26 @@ namespace RESTFUL
                 return new MongoClient(mongoDBSettings.ConnectionString);
             });
 
+            var pgsqlSettings = Configuration.GetSection(nameof(PGSQLSettings)).Get<PGSQLSettings>();
+            var dbProvider = Configuration.GetSection("DBProvider").Get<string>();
+
+            services.AddEntityFrameworkNpgsql()
+                .AddDbContext<PGSQLContext>(options =>
+                    options.UseNpgsql(
+                        $"Host='{pgsqlSettings.Host}'; Port={pgsqlSettings.Port};Database='{pgsqlSettings.DBName}';Username='{pgsqlSettings.User}';Password='{pgsqlSettings.Password}'"
+                    )
+                );
+
             // we should only need one instance throughout the app lifetime
-            // choose which repo to use (mongo, postgres, in memory, ...)
-            services.AddSingleton<IItemsRepository, MongoDBItemsRepository>();
+            // choose which repo to use (mongo, in memory, ...)
+            if (dbProvider == "mongo")
+            {
+                services.AddSingleton<IItemsRepository, MongoDBItemsRepository>();
+
+            } else if (dbProvider == "postgres") {
+                // using scoped for services that use db contexts
+                services.AddScoped<IItemsRepository, PGSQLItemsRepository>();
+            }
 
             services.AddControllers(options =>
             {

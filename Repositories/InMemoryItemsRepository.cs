@@ -10,11 +10,11 @@ namespace RESTFUL.Repositories
     public class InMemoryItemsRepository : IItemsRepository
     {
         // instance of the list should not change after construction
-        private readonly List<Item> items = new()
+        private readonly List<Item> items = new ()
         { // as of C# 9 new() is possible
-            new Item { Id = Guid.NewGuid(), Name = "Electric Guitar", Price = 100, CreatedDate = DateTimeOffset.UtcNow },
-            new Item { Id = Guid.NewGuid(), Name = "Acoustic Guitar", Price = 90, CreatedDate = DateTimeOffset.UtcNow },
-            new Item { Id = Guid.NewGuid(), Name = "Bass Electric Guitar", Price = 80, CreatedDate = DateTimeOffset.UtcNow }
+            new Item { Id = Guid.NewGuid(), Name = "Electric Guitar", Price = 100, CreatedDate = DateTime.UtcNow },
+            new Item { Id = Guid.NewGuid(), Name = "Acoustic Guitar", Price = 90, CreatedDate = DateTime.UtcNow },
+            new Item { Id = Guid.NewGuid(), Name = "Bass Electric Guitar", Price = 80, CreatedDate = DateTime.UtcNow }
         }; 
 
         public async Task<IEnumerable<Item>> GetItemsAsync()
