@@ -8,6 +8,7 @@ using RESTFUL.Interfaces;
 using RESTFUL.DTOs;
 using RESTFUL;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace RESTFUL.Controllers
 {
@@ -17,17 +18,25 @@ namespace RESTFUL.Controllers
     {
         // use dependency injection instead of creating new instances each time the endpoints are hit
         private readonly IItemsRepository _repository;
-        public ItemsController(IItemsRepository repository)
+
+        private readonly ILogger<ItemsController> _logger;
+
+        public ItemsController(IItemsRepository repository, ILogger<ItemsController> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         // GET /items
         [HttpGet]
         public async Task<IEnumerable<ItemDTO>> GetItems()
         {
-            return (await _repository.GetItemsAsync())
+            var items = (await _repository.GetItemsAsync())
                 .Select(item => item.AsDTO());
+
+            _logger.LogInformation($"Found {items.Count()} items.");
+
+            return items;
         }
 
         // GET /items/{id}
