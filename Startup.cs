@@ -80,7 +80,11 @@ namespace RESTFUL
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RESTFUL v1"));
             }
 
-            app.UseHttpsRedirection();
+            // we will use docker in production and won't need https internally
+            if (env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseRouting();
 
