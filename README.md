@@ -1,6 +1,6 @@
 # RESTFUL API example
 
-This currently targets dotnet 7 and was created using VS2022 Community. 
+This currently targets dotnet 9 and was created using VS2022 Community. 
 It uses dotnet secret manager for passwords instead of putting them in appsettings.
 It could be adapted to use a keyvault or some other external provider.
 Depending on what type of database you want to use there is an appsetting for either postgres or mongo.
