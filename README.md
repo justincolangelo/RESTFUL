@@ -28,6 +28,15 @@ CREATE TABLE IF NOT EXISTS "RESTFUL".items
 `dotnet user-secrets set MongoDBSettings:Password somepassword`
 `dotnet user-secrets set PGSQLSettings:Password somepassword`
 
+### To remove a secret
+`dotnet user-secrets remove PGSQLSettings:Password`
+
+### Create a migration
+`dotnet ef add migration {name of migration}`
+
+### Update the database
+`dotnet ef database update`
+
 ### Build the docker image
 `docker build -t yourdockerhub/restful:v1.0.0 .`
 
@@ -42,6 +51,9 @@ CREATE TABLE IF NOT EXISTS "RESTFUL".items
 `docker run -it --rm -p 2800:80 -e PGSQLSettings:Host=somenetworkwithyourpostgresdb -e PGSQLSettings:Password=password --network=restfulnet restful:v1.0.0`
 
 ## Using Kubernetes
+
+### Get context from AZ if needed
+az aks get-credentials -n dev --context dev --resource-group your-group
 
 ### Create the secret in kubectl for mongo pw
 `kubectl create secret generic restful-secrets --from-literal=mongodb-password='somepassword'`
