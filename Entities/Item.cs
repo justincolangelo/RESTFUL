@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace RESTFUL.Entities
 {
     // Schema was needed with Postgres otherwise "relation not found" errors thrown
-    [Table("items", Schema = "RESTFUL")]
+    [Table("Items", Schema = "RESTFUL")]
     public record Item
     {
         // init is used when a value is only allowed to be set during initialization
