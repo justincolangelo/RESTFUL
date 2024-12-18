@@ -9,11 +9,11 @@ using RESTFUL.Context;
 
 namespace RESTFUL.Repositories
 {
-    public class PGSQLItemsRepository : IItemsRepository
+    public class MSSQLItemsRepository : IItemsRepository
     {
-        private readonly PGSQLContext _context;
+        private readonly MSSQLContext _context;
 
-        public PGSQLItemsRepository(PGSQLContext context)
+        public MSSQLItemsRepository(MSSQLContext context)
         {
             _context = context;
         }
@@ -25,7 +25,7 @@ namespace RESTFUL.Repositories
 
         public async Task<Item> GetItemAsync(Guid id)
         {
-            return await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.FindAsync<Item>(id);
         }
 
         public async Task CreateItemAsync(Item item)
