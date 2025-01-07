@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +14,14 @@ using MongoDB.Driver;
 using RESTFUL.Context;
 using RESTFUL.Interfaces;
 using RESTFUL.Repositories;
+using RESTFUL.Services;
 using RESTFUL.Settings;
 using System.Text.Json;
 using System;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using Azure.Messaging.ServiceBus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +72,16 @@ else
     // using scoped for services that use db contexts
     builder.Services.AddScoped<IItemsRepository, MSSQLItemsRepository>();
 }
+
+var sbSettings = configuration.GetSection(nameof(ServiceBusSettings)).Get<ServiceBusSettings>();
+
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddServiceBusClient(sbSettings.ConnectionString);
+});
+
+builder.Services.AddScoped<ServiceBusService>();
+
 
 builder.Services.AddControllers(options =>
 {

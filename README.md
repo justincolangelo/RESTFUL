@@ -7,6 +7,7 @@ Depending on what type of database you want to use there is an appsetting for ei
 Dockerfile is provided to build a conatinerized version of the app for use in a Kubernetes cluster.
 The mongo db used locally was a containerized version.
 Postgres is version 15, but shouldn't be an issue for other recent versions. The schema is RESTFUL.
+This uses Azure Service Bus Emulator for local dev https://github.com/Azure/azure-service-bus-emulator-installer
 
 ### Migrations weren't used in this example for postgres
 ```

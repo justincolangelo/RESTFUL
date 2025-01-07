@@ -1,12 +1,14 @@
-﻿using System;
+﻿using RESTFUL.DTOs;
+using RESTFUL.Entities;
+using RESTFUL.Interfaces;
+using RESTFUL.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RESTFUL.Entities;
-using RESTFUL.Interfaces;
-using RESTFUL.DTOs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Azure.Messaging.ServiceBus;
 
 namespace RESTFUL.Controllers
 {
@@ -19,10 +21,13 @@ namespace RESTFUL.Controllers
 
         private readonly ILogger<ItemsController> _logger;
 
-        public ItemsController(IItemsRepository repository, ILogger<ItemsController> logger)
+        private readonly ServiceBusService _serviceBus;
+
+        public ItemsController(IItemsRepository repository, ILogger<ItemsController> logger, ServiceBusService serviceBus)
         {
             _repository = repository;
             _logger = logger;
+            _serviceBus = serviceBus;
         }
 
         // GET /items
@@ -32,7 +37,11 @@ namespace RESTFUL.Controllers
             var items = (await _repository.GetItemsAsync())
                 .Select(item => item.AsDTO());
 
-            _logger.LogInformation($"Found {items.Count()} items.");
+            var msg = $"Found {items.Count()} items.";
+
+            _logger.LogInformation(msg);
+
+            await _serviceBus.PublishMessageToDefaultQueue(msg);
 
             return items;
         }
@@ -106,6 +115,15 @@ namespace RESTFUL.Controllers
             await _repository.DeleteItemAsync(id);
 
             return NoContent();
+        }
+
+        // GET /items/messages
+        [HttpGet("messages")]
+        public async Task<List<string>> GetItemsMessages()
+        {
+            var messages = await _serviceBus.ConsumeMessageFromDefaultQueue();
+
+            return messages;
         }
     }
 }
